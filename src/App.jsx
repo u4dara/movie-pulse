@@ -1,5 +1,8 @@
-import Search from './components/Search.jsx';
 import { useEffect, useState } from 'react';
+
+import Search from './components/Search.jsx';
+import { Loader } from './components/Spinner.jsx';
+import MovieCard from './components/MovieCard.jsx';
 
 const API_BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -47,10 +50,10 @@ const App = () => {
    useEffect(() => {
       fetchMovies();
    }, []);
+
    return (
       <main>
          <div className="pattern" />
-
          <div className="wrapper">
             <header>
                <img src="./hero.png" alt="Hero Banner" />
@@ -62,10 +65,22 @@ const App = () => {
                <Search searchTerm={searchText} setSearchTerm={setSearchText} />
             </header>
 
-            <section className="all-movies mt-7">
+            <section className="all-movies mt-10">
                <h2>All Movies</h2>
 
-               {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+               {isLoading ? (
+                  <div className="flex justify-center">
+                     <Loader />
+                  </div>
+               ) : errorMessage ? (
+                  <p className="text-red-500">{errorMessage}</p>
+               ) : (
+                  <ul className="text-white">
+                     {movieList.map((movie) => (
+                        <MovieCard key={movie.id} movie={movie} />
+                     ))}
+                  </ul>
+               )}
             </section>
          </div>
       </main>
