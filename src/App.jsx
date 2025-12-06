@@ -15,15 +15,18 @@ const API_OPTIONS = {
 };
 
 const App = () => {
-   const [searchText, setSearchText] = useState('');
+   const [searchTerm, setSearchTerm] = useState('');
    const [errorMessage, setErrorMessage] = useState('');
    const [movieList, setMovieList] = useState([]);
    const [isLoading, setIsLoading] = useState(false);
 
-   const fetchMovies = async () => {
+   const fetchMovies = async (query = '') => {
       setIsLoading(true);
+      setErrorMessage('');
       try {
-         const endpoint = `${API_BASE_URL}/discover/movie?language=en-US&page=1&sort_by=popularity.desc`;
+         const endpoint = query
+            ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+            : `${API_BASE_URL}/discover/movie?language=en-US&page=1&sort_by=popularity.desc`;
 
          const response = await fetch(endpoint, API_OPTIONS);
          if (!response.ok) {
@@ -48,8 +51,8 @@ const App = () => {
    };
 
    useEffect(() => {
-      fetchMovies();
-   }, []);
+      fetchMovies(searchTerm);
+   }, [searchTerm]);
 
    return (
       <main>
@@ -62,7 +65,7 @@ const App = () => {
                   Enjoy without the Hassle
                </h1>
 
-               <Search searchTerm={searchText} setSearchTerm={setSearchText} />
+               <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             </header>
 
             <section className="all-movies mt-10">
