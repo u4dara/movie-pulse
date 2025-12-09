@@ -4,7 +4,7 @@ import { useDebounce } from 'react-use';
 import Search from './components/Search.jsx';
 import { Loader } from './components/Spinner.jsx';
 import MovieCard from './components/MovieCard.jsx';
-import { updateSearchCount } from './appwrite.js';
+import { updateSearchCount, fetchTrendingMovies } from './appwrite.js';
 
 const API_BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -22,6 +22,7 @@ const App = () => {
    const [movieList, setMovieList] = useState([]);
    const [isLoading, setIsLoading] = useState(false);
    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+   const [trendingMovies, setTrendingMovies] = useState([]);
 
    // Debounce the search term input to avoid excessive API calls
    // by updating debouncedSearchTerm 500ms after the user stops typing
@@ -61,9 +62,22 @@ const App = () => {
       }
    };
 
+   const loadTrendingMovies = async () => {
+      try {
+         const trendingMovies = await fetchTrendingMovies();
+         setTrendingMovies(trendingMovies);
+      } catch (e) {
+         console.log('Error fetching trending movies: ', e);
+      }
+   };
+
    useEffect(() => {
       fetchMovies(debouncedSearchTerm);
    }, [debouncedSearchTerm]);
+
+   useEffect(() => {
+      loadTrendingMovies();
+   }, []);
 
    return (
       <main>
@@ -78,6 +92,20 @@ const App = () => {
 
                <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             </header>
+
+            {trendingMovies.length > 0 ? (
+               <section className="trending">
+                  <h2>Trending Movies</h2>
+                  <ul>
+                     {trendingMovies.map((movie, index) => (
+                        <li key={index}>
+                           <p>{index + 1}</p>
+                           <img src={movie.poster_url} alt="movie-poster" />
+                        </li>
+                     ))}
+                  </ul>
+               </section>
+            ) : null}
 
             <section className="all-movies mt-10">
                <h2>All Movies</h2>

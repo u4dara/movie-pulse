@@ -46,3 +46,17 @@ export const updateSearchCount = async (searchTerm, movie) => {
       throw new Error('Failed to update search data in Appwrite.');
    }
 };
+
+export const fetchTrendingMovies = async () => {
+   try {
+      const result = await database.listRows({
+         databaseId: DATABASE_ID,
+         tableId: TABLE_ID,
+         queries: [Query.limit(5), Query.orderDesc('count')],
+      });
+
+      return result.rows;
+   } catch (e) {
+      throw new Error('Failed to fetch trending movies.');
+   }
+};
