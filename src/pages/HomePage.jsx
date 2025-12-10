@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDebounce } from 'react-use';
 
 import Search from '../components/Search.jsx';
@@ -17,6 +18,8 @@ const API_OPTIONS = {
 };
 
 const HomePage = () => {
+   const navigate = useNavigate();
+
    const [searchTerm, setSearchTerm] = useState('');
    const [errorMessage, setErrorMessage] = useState('');
    const [movieList, setMovieList] = useState([]);
@@ -71,6 +74,10 @@ const HomePage = () => {
       }
    };
 
+   const handleClick = (movie) => {
+      navigate(`/${movie.id}`, { state: { movie } });
+   };
+
    useEffect(() => {
       fetchMovies(debouncedSearchTerm);
    }, [debouncedSearchTerm]);
@@ -122,7 +129,13 @@ const HomePage = () => {
                ) : (
                   <ul className="text-white">
                      {movieList.map((movie) => (
-                        <MovieCard key={movie.id} movie={movie} />
+                        <MovieCard
+                           key={movie.id}
+                           movie={movie}
+                           onClick={() => {
+                              handleClick(movie);
+                           }}
+                        />
                      ))}
                   </ul>
                )}
